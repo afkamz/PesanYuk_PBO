@@ -1,0 +1,12 @@
+M001;Makanan;Nasi Goreng Spesial;22000;Sedang
+M002;Makanan;Ayam Bakar Madu;28000;Biasa
+M003;Makanan;Mie Goreng Seafood;25000;Pedas
+M004;Makanan;Kwetiau Sapi;27000;Sedang
+M005;Makanan;Kentang Goreng (Snack);15000;Biasa
+D001;Minuman;Es Teh Manis;5000;M
+D002;Minuman;Es Jeruk Peras;8000;M
+D003;Minuman;Kopi Susu Gula Aren;18000;L
+D004;Minuman;Matcha Latte;20000;L
+D005;Minuman;Air Mineral;4000;M
+M006;Makanan;Sate Ayam Madura;30000;Sedang
+D006;Minuman;Jus Alpukat Kocok;15000;L
