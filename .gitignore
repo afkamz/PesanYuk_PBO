@@ -20,3 +20,9 @@ nb-configuration.xml
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Microsoft Office & LibreOffice temp/lock files
+~$*
+~WRL*
+.~lock.*
+*.tmp
