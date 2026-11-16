@@ -1,2 +1,1 @@
-TRX-20261116-001;2026-11-16 12:58:44;3;3;79200;Tunai;Metode: Tunai | Diterima: Rp 100,000 | Kembalian: Rp 20,800
-TRX-20261116-002;2026-11-16 12:58:44;6;5;161700;QRIS;Metode: QRIS | Ref: QRIS-2E82E7DA | Status: LUNAS (Verified)
+TRX-20261116-001;2026-11-16 14:17:33;1;2;59400;Tunai;Metode: Tunai | Diterima: Rp 100,000 | Kembalian: Rp 40,600
