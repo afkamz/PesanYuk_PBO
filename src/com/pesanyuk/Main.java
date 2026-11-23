@@ -21,13 +21,34 @@ public class Main {
     private static Scanner scanner;
 
     public static void main(String[] args) {
+        // Jika diberikan argumen --cli atau -c, langsung ke mode terminal
+        if (args.length > 0 && (args[0].equalsIgnoreCase("--cli") || args[0].equalsIgnoreCase("-c"))) {
+            jalankanModeCLI();
+            return;
+        }
+
+        // Default: Meluncurkan Antarmuka GUI Modern (Figma Style)
+        System.out.println("=====================================================");
+        System.out.println("  Meluncurkan GUI Modern PesanYuk POS (Figma UI)... ");
+        System.out.println("  Tip: Gunakan opsi '--cli' untuk mode konsol teks.  ");
+        System.out.println("=====================================================");
+
+        try {
+            com.pesanyuk.gui.MainFrame.main(args);
+        } catch (Exception e) {
+            System.err.println("Gagal membuka GUI, beralih ke mode konsol: " + e.getMessage());
+            jalankanModeCLI();
+        }
+    }
+
+    public static void jalankanModeCLI() {
         scanner = new Scanner(System.in);
         inisialisasiSistem();
 
         boolean running = true;
         while (running) {
             tampilkanMenuUtama();
-            System.out.print("Pilih menu (0-6): ");
+            System.out.print("Pilih menu (0-7): ");
             String pilihan = scanner.nextLine().trim();
 
             switch (pilihan) {
@@ -48,6 +69,10 @@ public class Main {
                     break;
                 case "6":
                     jalankanDemoOtomatis();
+                    break;
+                case "7":
+                    System.out.println("Membuka GUI PesanYuk...");
+                    com.pesanyuk.gui.MainFrame.main(new String[]{});
                     break;
                 case "0":
                     System.out.println("\nMenyimpan data sebelum keluar...");
@@ -105,6 +130,7 @@ public class Main {
         System.out.println(" [4] Cari Menu");
         System.out.println(" [5] Lihat Riwayat Transaksi");
         System.out.println(" [6] Jalankan Demo Pengujian Otomatis (9 Skenario OOP)");
+        System.out.println(" [7] Buka Antarmuka GUI Modern (Figma Style)");
         System.out.println(" [0] Keluar Aplikasi");
         System.out.println("--------------------------------------------------------");
     }
