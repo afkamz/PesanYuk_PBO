@@ -1,47 +1,58 @@
 package com.pesanyuk.gui;
 
 import java.awt.*;
+import java.awt.geom.*;
 import javax.swing.*;
 
 /**
- * Menyediakan Icon berbasis Java 2D Vector yang tajam dan dijamin 100% tidak akan
- * menjadi kotak kosong ("□" tofu box) di Windows maupun OS mana pun.
+ * Pustaka Icon Vektor murni digambar dengan Java Graphics2D.
+ * Menghasilkan tampilan yang tajam di semua DPI dan bebas masalah kotak tanda tanya (tofu box) di Windows.
  */
 public final class VectorIcons {
 
     private VectorIcons() {}
 
     /**
-     * Icon Kaca Pembesar (Search)
+     * Logo resmi PesanYuk: Cloche (Tudung Saji Restoran) oranye emas.
      */
-    public static Icon getSearchIcon(int size, Color color) {
+    public static Icon getClocheIcon(int size, Color color) {
         return new Icon() {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
-                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-                int r = (int) (size * 0.58);
-                g2.drawOval(x + 1, y + 1, r, r);
+                float scale = size / 24.0f;
+                g2.translate(x, y);
+                g2.scale(scale, scale);
 
-                int x1 = x + 1 + (int) (r * 0.85);
-                int y1 = y + 1 + (int) (r * 0.85);
-                int x2 = x + size - 2;
-                int y2 = y + size - 2;
-                g2.drawLine(x1, y1, x2, y2);
+                // Handle tudung saji di atas (lingkaran kecil)
+                g2.fillOval(10, 4, 4, 4);
+
+                // Kubah tudung saji (arc)
+                g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawArc(4, 7, 16, 14, 0, 180);
+
+                // Garis piring di bawah
+                g2.drawLine(2, 16, 22, 16);
+
+                // Kaki piring
+                g2.drawLine(4, 18, 20, 18);
 
                 g2.dispose();
             }
 
-            @Override public int getIconWidth() { return size; }
-            @Override public int getIconHeight() { return size; }
+            @Override
+            public int getIconWidth() { return size; }
+
+            @Override
+            public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Grid Kasir (4 kotak kecil 2x2)
+     * Icon Grid (4 kotak) untuk Menu Kasir
      */
     public static Icon getGridIcon(int size, Color color) {
         return new Icon() {
@@ -50,75 +61,24 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
 
-                int boxSize = (size - 4) / 2;
-                g2.fillRoundRect(x, y, boxSize, boxSize, 3, 3);
-                g2.fillRoundRect(x + boxSize + 3, y, boxSize, boxSize, 3, 3);
-                g2.fillRoundRect(x, y + boxSize + 3, boxSize, boxSize, 3, 3);
-                g2.fillRoundRect(x + boxSize + 3, y + boxSize + 3, boxSize, boxSize, 3, 3);
-
+                g2.setStroke(new BasicStroke(1.8f));
+                g2.drawRoundRect(1, 1, 5, 5, 2, 2);
+                g2.drawRoundRect(9, 1, 5, 5, 2, 2);
+                g2.drawRoundRect(1, 9, 5, 5, 2, 2);
+                g2.drawRoundRect(9, 9, 5, 5, 2, 2);
                 g2.dispose();
             }
-
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Menu Bar (3 garis horizontal)
-     */
-    public static Icon getMenuIcon(int size, Color color) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-                int step = size / 4;
-                g2.drawLine(x + 1, y + step, x + size - 1, y + step);
-                g2.drawLine(x + 1, y + step * 2, x + size - 1, y + step * 2);
-                g2.drawLine(x + 1, y + step * 3, x + size - 1, y + step * 3);
-
-                g2.dispose();
-            }
-
-            @Override public int getIconWidth() { return size; }
-            @Override public int getIconHeight() { return size; }
-        };
-    }
-
-    /**
-     * Icon Meja Restoran (permukaan meja + 2 kaki)
-     */
-    public static Icon getTableIcon(int size, Color color) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-                // Permukaan Meja
-                g2.fillRoundRect(x + 1, y + 2, size - 2, 4, 2, 2);
-
-                // Kaki Meja Kiri dan Kanan
-                g2.drawLine(x + 3, y + 6, x + 3, y + size - 1);
-                g2.drawLine(x + size - 4, y + 6, x + size - 4, y + size - 1);
-
-                g2.dispose();
-            }
-
-            @Override public int getIconWidth() { return size; }
-            @Override public int getIconHeight() { return size; }
-        };
-    }
-
-    /**
-     * Icon Jam Riwayat
+     * Icon Riwayat (Panah memutar / Counter-Clockwise Arrow dengan jarum jam)
      */
     public static Icon getClockIcon(int size, Color color) {
         return new Icon() {
@@ -127,25 +87,104 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
                 g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-                g2.drawOval(x + 1, y + 1, size - 3, size - 3);
-
-                int cx = x + size / 2;
-                int cy = y + size / 2;
-                g2.drawLine(cx, cy, cx, cy - (size / 4));
-                g2.drawLine(cx, cy, cx + (size / 4), cy);
+                // Lingkaran terbuka riwayat
+                g2.drawArc(2, 2, 12, 12, 45, 270);
+                // Jarum jam
+                g2.drawLine(8, 8, 8, 5);
+                g2.drawLine(8, 8, 11, 8);
+                // Ujung panah
+                g2.drawLine(2, 6, 2, 2);
+                g2.drawLine(2, 2, 6, 2);
 
                 g2.dispose();
             }
-
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Keranjang / Receipt
+     * Icon Meja Restoran
+     */
+    public static Icon getTableIcon(int size, Color color) {
+        return new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
+                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(2, 5, 14, 5); // Meja atas
+                g2.drawLine(4, 5, 4, 14); // Kaki kiri
+                g2.drawLine(12, 5, 12, 14); // Kaki kanan
+                g2.drawLine(4, 9, 12, 9); // Palang
+                g2.dispose();
+            }
+            @Override public int getIconWidth() { return size; }
+            @Override public int getIconHeight() { return size; }
+        };
+    }
+
+    /**
+     * Icon Kelola Menu (List bar / Sendok Garpu)
+     */
+    public static Icon getMenuIcon(int size, Color color) {
+        return new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
+                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(2, 4, 14, 4);
+                g2.drawLine(2, 8, 14, 8);
+                g2.drawLine(2, 12, 14, 12);
+                g2.dispose();
+            }
+            @Override public int getIconWidth() { return size; }
+            @Override public int getIconHeight() { return size; }
+        };
+    }
+
+    /**
+     * Icon Search Kaca Pembesar
+     */
+    public static Icon getSearchIcon(int size, Color color) {
+        return new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
+                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawOval(2, 2, 8, 8);
+                g2.drawLine(8, 8, 14, 14);
+                g2.dispose();
+            }
+            @Override public int getIconWidth() { return size; }
+            @Override public int getIconHeight() { return size; }
+        };
+    }
+
+    /**
+     * Icon Kertas Nota / Keranjang Pesanan (Kuning di mockup)
      */
     public static Icon getReceiptIcon(int size, Color color) {
         return new Icon() {
@@ -154,28 +193,26 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
                 g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-                // Garis kertas struk
-                int w = size - 4;
-                int h = size - 2;
-                g2.drawRoundRect(x + 2, y + 1, w, h, 3, 3);
-
-                // Garis-garis tulisan di struk
-                g2.drawLine(x + 5, y + 5, x + size - 5, y + 5);
-                g2.drawLine(x + 5, y + 8, x + size - 5, y + 8);
-                g2.drawLine(x + 5, y + 11, x + size - 8, y + 11);
-
+                // Dokumen
+                g2.drawRoundRect(2, 1, 12, 14, 2, 2);
+                // Garis teks di dokumen
+                g2.drawLine(5, 5, 11, 5);
+                g2.drawLine(5, 8, 11, 8);
+                g2.drawLine(5, 11, 9, 11);
                 g2.dispose();
             }
-
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Tong Sampah (Trash)
+     * Icon Tempat Sampah (Merah)
      */
     public static Icon getTrashIcon(int size, Color color) {
         return new Icon() {
@@ -184,29 +221,27 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
-                g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
 
-                // Tutup sampah
-                g2.drawLine(x + 2, y + 4, x + size - 2, y + 4);
-                g2.drawLine(x + (size / 2) - 2, y + 2, x + (size / 2) + 2, y + 2);
-
-                // Badan tong sampah
-                g2.drawRoundRect(x + 3, y + 4, size - 6, size - 6, 2, 2);
-
-                // Garis vertikal dalam tong
-                g2.drawLine(x + (size / 2) - 2, y + 7, x + (size / 2) - 2, y + size - 4);
-                g2.drawLine(x + (size / 2) + 2, y + 7, x + (size / 2) + 2, y + size - 4);
-
+                g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(3, 4, 13, 4); // Garis tutup
+                g2.drawLine(6, 2, 10, 2); // Pegangan tutup
+                g2.drawLine(4, 4, 5, 14); // Sisi kiri
+                g2.drawLine(12, 4, 11, 14); // Sisi kanan
+                g2.drawLine(5, 14, 11, 14); // Dasar
+                g2.drawLine(7, 7, 7, 11); // Garis dalam
+                g2.drawLine(9, 7, 9, 11);
                 g2.dispose();
             }
-
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Pensil (Edit)
+     * Icon Edit Pensil (Hijau)
      */
     public static Icon getEditIcon(int size, Color color) {
         return new Icon() {
@@ -215,25 +250,25 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
                 g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-                // Garis diagonal pensil
-                g2.drawLine(x + size - 3, y + 3, x + 5, y + size - 5);
-                g2.drawLine(x + size - 5, y + 1, x + 3, y + size - 7);
-                // Ujung pensil
-                g2.drawLine(x + 3, y + size - 7, x + 1, y + size - 1);
-                g2.drawLine(x + 1, y + size - 1, x + 5, y + size - 5);
-
+                g2.drawLine(10, 2, 14, 6);
+                g2.drawLine(10, 2, 3, 9);
+                g2.drawLine(14, 6, 7, 13);
+                g2.drawLine(3, 9, 2, 14);
+                g2.drawLine(2, 14, 7, 13);
                 g2.dispose();
             }
-
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };
     }
 
     /**
-     * Icon Keluar (Logout - Pintu + Panah)
+     * Icon Keluar (Panah Oranye)
      */
     public static Icon getLogoutIcon(int size, Color color) {
         return new Icon() {
@@ -242,22 +277,75 @@ public final class VectorIcons {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(color);
-                g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
 
-                // Bingkai pintu
-                g2.drawLine(x + 5, y + 2, x + 1, y + 2);
-                g2.drawLine(x + 1, y + 2, x + 1, y + size - 2);
-                g2.drawLine(x + 1, y + size - 2, x + 5, y + size - 2);
-
+                g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                // Pintu / Box
+                g2.drawLine(7, 2, 2, 2);
+                g2.drawLine(2, 2, 2, 14);
+                g2.drawLine(2, 14, 7, 14);
                 // Panah keluar
-                int cy = y + size / 2;
-                g2.drawLine(x + 4, cy, x + size - 2, cy);
-                g2.drawLine(x + size - 5, cy - 3, x + size - 2, cy);
-                g2.drawLine(x + size - 5, cy + 3, x + size - 2, cy);
-
+                g2.drawLine(6, 8, 14, 8);
+                g2.drawLine(11, 5, 14, 8);
+                g2.drawLine(11, 11, 14, 8);
                 g2.dispose();
             }
+            @Override public int getIconWidth() { return size; }
+            @Override public int getIconHeight() { return size; }
+        };
+    }
 
+    /**
+     * Icon Kalender
+     */
+    public static Icon getCalendarIcon(int size, Color color) {
+        return new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
+                g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawRoundRect(2, 3, 12, 11, 2, 2);
+                g2.drawLine(2, 6, 14, 6);
+                g2.drawLine(5, 1, 5, 4);
+                g2.drawLine(11, 1, 11, 4);
+                g2.dispose();
+            }
+            @Override public int getIconWidth() { return size; }
+            @Override public int getIconHeight() { return size; }
+        };
+    }
+
+    /**
+     * Icon Cetak / Printer
+     */
+    public static Icon getPrintIcon(int size, Color color) {
+        return new Icon() {
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                float s = size / 16.0f;
+                g2.translate(x, y);
+                g2.scale(s, s);
+
+                g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                // Kertas atas
+                g2.drawRect(4, 2, 8, 4);
+                // Body printer
+                g2.drawRoundRect(2, 6, 12, 6, 2, 2);
+                // Kertas keluar bawah
+                g2.drawRect(4, 9, 8, 5);
+                g2.dispose();
+            }
             @Override public int getIconWidth() { return size; }
             @Override public int getIconHeight() { return size; }
         };

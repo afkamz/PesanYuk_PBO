@@ -6,12 +6,12 @@ import com.pesanyuk.manager.OrderManager;
 import com.pesanyuk.util.FileHandler;
 
 import java.awt.*;
-import java.io.IOException;
 import javax.swing.*;
 
 /**
  * Main Frame Aplikasi GUI PesanYuk.
  * Menampilkan Halaman Login terlebih dahulu, kemudian masuk ke Dashboard Kasir / Admin.
+ * Didesain persis dengan mockup terbaru di folder Gambar/.
  */
 public class MainFrame extends JFrame {
 
@@ -22,7 +22,7 @@ public class MainFrame extends JFrame {
     private String currentRole = "Kasir";
     private String currentUsername = "kasir";
 
-    // Layout Root untuk berpindah antara Halaman Login dan Dashboard Utama
+    // Layout Root
     private CardLayout rootCardLayout;
     private JPanel rootContainer;
 
@@ -43,8 +43,8 @@ public class MainFrame extends JFrame {
         inisialisasiData();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1240, 780);
-        setMinimumSize(new Dimension(1040, 680));
+        setSize(1280, 800);
+        setMinimumSize(new Dimension(1080, 700));
         setLocationRelativeTo(null);
 
         initComponents();
@@ -84,12 +84,12 @@ public class MainFrame extends JFrame {
         rootCardLayout = new CardLayout();
         rootContainer = new JPanel(rootCardLayout);
 
-        // 1. HALAMAN LOGIN (Ditampilkan pertama kali)
+        // 1. HALAMAN LOGIN
         loginPanel = new LoginPanel((role, username) -> {
             masukKeAplikasi(role, username);
         });
 
-        // 2. DASHBOARD UTAMA (Sidebar + Area Konten)
+        // 2. DASHBOARD UTAMA (Sidebar Gelap + Area Konten)
         dashboardPanel = new JPanel(new BorderLayout());
 
         sidebarPanel = new SidebarPanel(currentRole, currentUsername, "NAV_KASIR", new SidebarPanel.NavListener() {

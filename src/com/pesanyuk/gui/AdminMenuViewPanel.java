@@ -1,6 +1,5 @@
 package com.pesanyuk.gui;
 
-import com.pesanyuk.exception.InputTidakValidException;
 import com.pesanyuk.exception.MenuNotFoundException;
 import com.pesanyuk.manager.MenuManager;
 import com.pesanyuk.model.Makanan;
@@ -12,7 +11,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,31 +18,63 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- * Tampilan Kelola Menu Admin persis seperti Mockup Figma 2:
- * - Header dengan judul "Kelola Menu" dan tombol "+ Tambah Menu" oranye
- * - Card tabel putih dengan search bar "Cari nama atau ID menu..."
- * - Kolom ID, Nama, Kategori (Pill Makanan/Minuman), Harga, Atribut, Aksi (Edit & Hapus)
+ * Tampilan Kelola Menu Admin persis seperti Mockup Figma Gambar/admin/riwayat (1).png:
+ * - Banner gelap atas bertuliskan "ADMIN"
+ * - Header: Judul "Kelola Menu", Subtitle "Kelola daftar makanan dan minuman restoran"
+ *   serta tombol "+ Tambah menu" warna gelap (#262D35) di sisi kanan
+ * - Card tabel putih dengan search bar "Cari id atau menu..."
+ * - Kolom: Id (pill badge cream), Nama, Kategori, Harga, Aksi (Edit pensil & Hapus sampah)
  */
 public class AdminMenuViewPanel extends JPanel {
 
     private MenuManager menuManager;
     private SearchField txtSearch;
-    private JLabel lblMenuCount;
     private JPanel tableBody;
 
     public AdminMenuViewPanel(MenuManager menuManager) {
         this.menuManager = menuManager;
 
-        setLayout(new BorderLayout(0, 20));
+        setLayout(new BorderLayout());
         setBackground(UITheme.BG_MAIN);
-        setBorder(new EmptyBorder(24, 28, 24, 28));
 
         initComponents();
         refreshTable();
     }
 
     private void initComponents() {
-        // --- 1. Top Header: Judul + Tombol "+ Tambah Menu" ---
+        // --- 1. BANNER GELAP ATAS "ADMIN" ---
+        JPanel bannerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(UITheme.BANNER_BG);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+
+                g2.setColor(new Color(0x28, 0x2E, 0x37));
+                for (int i = 0; i < getWidth(); i += 90) {
+                    g2.fillOval(i - 20, -30, 80, 80);
+                }
+                g2.dispose();
+            }
+        };
+        bannerPanel.setLayout(new GridBagLayout());
+        bannerPanel.setPreferredSize(new Dimension(0, 72));
+
+        JLabel lblBannerTitle = new JLabel("ADMIN");
+        lblBannerTitle.setFont(UITheme.FONT_BANNER);
+        lblBannerTitle.setForeground(Color.WHITE);
+        bannerPanel.add(lblBannerTitle);
+
+        add(bannerPanel, BorderLayout.NORTH);
+
+        // --- 2. KONTEN UTAMA ---
+        JPanel mainContent = new JPanel(new BorderLayout(0, 16));
+        mainContent.setOpaque(false);
+        mainContent.setBorder(new EmptyBorder(16, 24, 20, 24));
+
+        // Header: Judul "Kelola Menu" + Tombol Gelap "+ Tambah menu"
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
@@ -56,7 +86,7 @@ public class AdminMenuViewPanel extends JPanel {
         lblTitle.setFont(UITheme.FONT_TITLE);
         lblTitle.setForeground(UITheme.TEXT_DARK);
 
-        JLabel lblSubtitle = new JLabel("Atur daftar makanan dan minuman restoran");
+        JLabel lblSubtitle = new JLabel("Kelola daftar makanan dan minuman restoran");
         lblSubtitle.setFont(UITheme.FONT_SUBTITLE);
         lblSubtitle.setForeground(UITheme.TEXT_MUTED);
 
@@ -64,42 +94,48 @@ public class AdminMenuViewPanel extends JPanel {
         titlePanel.add(Box.createRigidArea(new Dimension(0, 4)));
         titlePanel.add(lblSubtitle);
 
-        PrimaryButton btnTambahMenu = new PrimaryButton("+ Tambah Menu", 12);
+        // Tombol Tambah Menu Gelap (#262D35)
+        JButton btnTambahMenu = new JButton("+ Tambah menu") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(UITheme.DARK_BUTTON_BG);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btnTambahMenu.setFont(UITheme.FONT_BOLD);
+        btnTambahMenu.setForeground(Color.WHITE);
+        btnTambahMenu.setContentAreaFilled(false);
+        btnTambahMenu.setBorderPainted(false);
+        btnTambahMenu.setFocusPainted(false);
+        btnTambahMenu.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnTambahMenu.setPreferredSize(new Dimension(150, 40));
         btnTambahMenu.addActionListener(e -> bukaDialogForm(null));
 
         headerPanel.add(titlePanel, BorderLayout.WEST);
         headerPanel.add(btnTambahMenu, BorderLayout.EAST);
 
-        add(headerPanel, BorderLayout.NORTH);
+        mainContent.add(headerPanel, BorderLayout.NORTH);
 
-        // --- 2. Main Card Tabel Menu ---
-        RoundedPanel cardPanel = new RoundedPanel(16, UITheme.CARD_BG, UITheme.BORDER_COLOR, 1);
+        // --- 3. MAIN CARD TABEL MENU ---
+        RoundedPanel cardPanel = new RoundedPanel(20, Color.WHITE, UITheme.BORDER_COLOR, 1);
         cardPanel.setLayout(new BorderLayout(0, 14));
-        cardPanel.setBorder(new EmptyBorder(20, 24, 20, 24));
+        cardPanel.setBorder(new EmptyBorder(18, 20, 18, 20));
 
-        // Sub-header di dalam kartu: Search Bar & Label Counter
-        JPanel cardTop = new JPanel(new BorderLayout());
-        cardTop.setOpaque(false);
-
-        txtSearch = new SearchField("Cari nama atau ID menu...");
-        txtSearch.setPreferredSize(new Dimension(280, 38));
+        // Search Bar
+        txtSearch = new SearchField("Cari id atau menu...");
+        txtSearch.setPreferredSize(new Dimension(320, 38));
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { refreshTable(); }
             public void removeUpdate(DocumentEvent e) { refreshTable(); }
             public void changedUpdate(DocumentEvent e) { refreshTable(); }
         });
+        cardPanel.add(txtSearch, BorderLayout.NORTH);
 
-        lblMenuCount = new JLabel("0 menu tersedia");
-        lblMenuCount.setFont(UITheme.FONT_SMALL);
-        lblMenuCount.setForeground(UITheme.TEXT_MUTED);
-
-        cardTop.add(txtSearch, BorderLayout.WEST);
-        cardTop.add(lblMenuCount, BorderLayout.EAST);
-
-        cardPanel.add(cardTop, BorderLayout.NORTH);
-
-        // Header Kolom Tabel & Konten
+        // Table Header & Body
         JPanel tableContainer = new JPanel(new BorderLayout());
         tableContainer.setOpaque(false);
 
@@ -119,20 +155,21 @@ public class AdminMenuViewPanel extends JPanel {
         tableContainer.add(scrollPane, BorderLayout.CENTER);
         cardPanel.add(tableContainer, BorderLayout.CENTER);
 
-        add(cardPanel, BorderLayout.CENTER);
+        mainContent.add(cardPanel, BorderLayout.CENTER);
+
+        add(mainContent, BorderLayout.CENTER);
     }
 
     private JPanel buildTableHeader() {
-        // Grid 6 kolom: ID, Nama, Kategori, Harga, Atribut, Aksi
         JPanel header = new JPanel(new GridBagLayout());
         header.setBackground(new Color(0xF9, 0xFA, 0xFB));
-        header.setPreferredSize(new Dimension(0, 36));
+        header.setPreferredSize(new Dimension(0, 38));
         header.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, UITheme.BORDER_COLOR),
                 new EmptyBorder(8, 14, 8, 14)));
 
-        String[] cols = {"ID", "NAMA", "KATEGORI", "HARGA", "ATRIBUT", "AKSI"};
-        double[] weights = {0.10, 0.28, 0.16, 0.18, 0.16, 0.12};
+        String[] cols = {"Id", "Nama", "Kategori", "Harga", "Aksi"};
+        double[] weights = {0.14, 0.36, 0.22, 0.18, 0.10};
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -142,8 +179,8 @@ public class AdminMenuViewPanel extends JPanel {
             gbc.gridx = i;
             gbc.weightx = weights[i];
             JLabel lbl = new JLabel(cols[i]);
-            lbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
-            lbl.setForeground(UITheme.TEXT_LIGHT);
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lbl.setForeground(UITheme.TEXT_MUTED);
             if (i == cols.length - 1) {
                 lbl.setHorizontalAlignment(SwingConstants.CENTER);
             } else {
@@ -160,9 +197,7 @@ public class AdminMenuViewPanel extends JPanel {
         String keyword = txtSearch.getText().trim().toLowerCase();
 
         List<MenuItem> list = menuManager.getDaftarMenu();
-        int count = 0;
-
-        double[] weights = {0.10, 0.28, 0.16, 0.18, 0.16, 0.12};
+        double[] weights = {0.14, 0.36, 0.22, 0.18, 0.10};
 
         for (MenuItem item : list) {
             if (!keyword.isEmpty()) {
@@ -172,12 +207,9 @@ public class AdminMenuViewPanel extends JPanel {
                 if (!match) continue;
             }
 
-            count++;
-            JPanel row = buildTableRow(item, weights);
-            tableBody.add(row);
+            tableBody.add(buildTableRow(item, weights));
         }
 
-        lblMenuCount.setText(count + " menu tersedia");
         tableBody.revalidate();
         tableBody.repaint();
     }
@@ -187,42 +219,36 @@ public class AdminMenuViewPanel extends JPanel {
         row.setBackground(Color.WHITE);
         row.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0xF3, 0xF4, 0xF6)),
-                new EmptyBorder(10, 14, 10, 14)));
+                new EmptyBorder(12, 14, 12, 14)));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 4, 0, 4);
 
-        boolean isMakanan = item instanceof Makanan;
-
-        // 1. ID
+        // 1. Id (Badge rounded cream)
         gbc.gridx = 0;
         gbc.weightx = weights[0];
-        JLabel lblId = new JLabel(item.getId());
-        lblId.setFont(UITheme.FONT_SMALL);
-        lblId.setForeground(UITheme.TEXT_MUTED);
-        row.add(lblId, gbc);
+        BadgeLabel idBadge = new BadgeLabel(item.getId(), new Color(0xFE, 0xEB, 0xDF), UITheme.TEXT_DARK);
+        JPanel pId = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pId.setOpaque(false);
+        pId.add(idBadge);
+        row.add(pId, gbc);
 
         // 2. Nama
         gbc.gridx = 1;
         gbc.weightx = weights[1];
         JLabel lblNama = new JLabel(item.getNama());
-        lblNama.setFont(UITheme.FONT_BOLD);
+        lblNama.setFont(UITheme.FONT_REGULAR);
         lblNama.setForeground(UITheme.TEXT_DARK);
         row.add(lblNama, gbc);
 
-        // 3. Kategori (Pill)
+        // 3. Kategori
         gbc.gridx = 2;
         gbc.weightx = weights[2];
-        JPanel catPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        catPanel.setOpaque(false);
-        BadgeLabel catBadge = new BadgeLabel(
-                item.getKategori(),
-                isMakanan ? UITheme.BADGE_MAKANAN_BG : UITheme.BADGE_MINUMAN_BG,
-                isMakanan ? UITheme.BADGE_MAKANAN_FG : UITheme.BADGE_MINUMAN_FG
-        );
-        catPanel.add(catBadge);
-        row.add(catPanel, gbc);
+        JLabel lblKat = new JLabel(item.getKategori());
+        lblKat.setFont(UITheme.FONT_REGULAR);
+        lblKat.setForeground(UITheme.TEXT_DARK);
+        row.add(lblKat, gbc);
 
         // 4. Harga
         gbc.gridx = 3;
@@ -232,25 +258,14 @@ public class AdminMenuViewPanel extends JPanel {
         lblHarga.setForeground(UITheme.TEXT_DARK);
         row.add(lblHarga, gbc);
 
-        // 5. Atribut (Pedas: X / Ukuran: Y)
+        // 5. Aksi (Icon Pensil Hijau & Icon Sampah Merah)
         gbc.gridx = 4;
         gbc.weightx = weights[4];
-        String atributStr = isMakanan
-                ? "Pedas: " + ((Makanan) item).getTingkatPedas()
-                : "Ukuran: " + ((Minuman) item).getUkuran();
-        JLabel lblAtr = new JLabel(atributStr);
-        lblAtr.setFont(UITheme.FONT_REGULAR);
-        lblAtr.setForeground(UITheme.TEXT_MUTED);
-        row.add(lblAtr, gbc);
-
-        // 6. Aksi (Edit Pencil & Delete Trash)
-        gbc.gridx = 5;
-        gbc.weightx = weights[5];
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         actionPanel.setOpaque(false);
 
-        // Tombol Edit Biru (Vector Icon)
-        JLabel btnEdit = createActionButton(VectorIcons.getEditIcon(14, UITheme.EDIT_FG), UITheme.EDIT_BG);
+        JLabel btnEdit = new JLabel(VectorIcons.getEditIcon(16, UITheme.EDIT_FG));
+        btnEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnEdit.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -258,8 +273,8 @@ public class AdminMenuViewPanel extends JPanel {
             }
         });
 
-        // Tombol Hapus Merah (Vector Icon)
-        JLabel btnDelete = createActionButton(VectorIcons.getTrashIcon(14, UITheme.DANGER_FG), UITheme.DANGER_BG);
+        JLabel btnDelete = new JLabel(VectorIcons.getTrashIcon(16, UITheme.DANGER_FG));
+        btnDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnDelete.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -272,23 +287,6 @@ public class AdminMenuViewPanel extends JPanel {
         row.add(actionPanel, gbc);
 
         return row;
-    }
-
-    private JLabel createActionButton(Icon icon, Color bg) {
-        JLabel btn = new JLabel(icon, SwingConstants.CENTER) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(bg);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-        btn.setPreferredSize(new Dimension(28, 28));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
 
     private void bukaDialogForm(MenuItem itemToEdit) {

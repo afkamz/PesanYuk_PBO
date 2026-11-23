@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * Tampilan Kelola Meja: Grid visual meja dengan status Tersedia (Hijau) / Terisi (Merah).
+ * Dilengkapi Banner atas gelap "ADMIN" yang selaras dengan seluruh tampilan aplikasi.
  */
 public class AdminMejaViewPanel extends JPanel {
 
@@ -25,15 +26,46 @@ public class AdminMejaViewPanel extends JPanel {
     public AdminMejaViewPanel(MejaManager mejaManager) {
         this.mejaManager = mejaManager;
 
-        setLayout(new BorderLayout(0, 20));
+        setLayout(new BorderLayout());
         setBackground(UITheme.BG_MAIN);
-        setBorder(new EmptyBorder(24, 28, 24, 28));
 
         initComponents();
         refreshMejaGrid();
     }
 
     private void initComponents() {
+        // --- 1. BANNER GELAP ATAS "ADMIN" ---
+        JPanel bannerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(UITheme.BANNER_BG);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+
+                g2.setColor(new Color(0x28, 0x2E, 0x37));
+                for (int i = 0; i < getWidth(); i += 90) {
+                    g2.fillOval(i - 20, -30, 80, 80);
+                }
+                g2.dispose();
+            }
+        };
+        bannerPanel.setLayout(new GridBagLayout());
+        bannerPanel.setPreferredSize(new Dimension(0, 72));
+
+        JLabel lblBannerTitle = new JLabel("ADMIN");
+        lblBannerTitle.setFont(UITheme.FONT_BANNER);
+        lblBannerTitle.setForeground(Color.WHITE);
+        bannerPanel.add(lblBannerTitle);
+
+        add(bannerPanel, BorderLayout.NORTH);
+
+        // --- 2. KONTEN UTAMA ---
+        JPanel mainContent = new JPanel(new BorderLayout(0, 16));
+        mainContent.setOpaque(false);
+        mainContent.setBorder(new EmptyBorder(16, 24, 20, 24));
+
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
@@ -61,7 +93,23 @@ public class AdminMejaViewPanel extends JPanel {
         btnResetSemua.setPreferredSize(new Dimension(180, 40));
         btnResetSemua.addActionListener(e -> resetSemuaMeja());
 
-        PrimaryButton btnTambahMeja = new PrimaryButton("+ Tambah Meja", 12);
+        JButton btnTambahMeja = new JButton("+ Tambah Meja") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(UITheme.DARK_BUTTON_BG);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btnTambahMeja.setFont(UITheme.FONT_BOLD);
+        btnTambahMeja.setForeground(Color.WHITE);
+        btnTambahMeja.setContentAreaFilled(false);
+        btnTambahMeja.setBorderPainted(false);
+        btnTambahMeja.setFocusPainted(false);
+        btnTambahMeja.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnTambahMeja.setPreferredSize(new Dimension(140, 40));
         btnTambahMeja.addActionListener(e -> dialogTambahMeja());
 
@@ -71,12 +119,12 @@ public class AdminMejaViewPanel extends JPanel {
         headerPanel.add(titlePanel, BorderLayout.WEST);
         headerPanel.add(headerActions, BorderLayout.EAST);
 
-        add(headerPanel, BorderLayout.NORTH);
+        mainContent.add(headerPanel, BorderLayout.NORTH);
 
         // Main Card
-        RoundedPanel cardPanel = new RoundedPanel(16, UITheme.CARD_BG, UITheme.BORDER_COLOR, 1);
+        RoundedPanel cardPanel = new RoundedPanel(20, Color.WHITE, UITheme.BORDER_COLOR, 1);
         cardPanel.setLayout(new BorderLayout(0, 16));
-        cardPanel.setBorder(new EmptyBorder(20, 24, 20, 24));
+        cardPanel.setBorder(new EmptyBorder(18, 20, 18, 20));
 
         // Ringkasan Status Meja (Badges)
         JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
@@ -105,8 +153,9 @@ public class AdminMejaViewPanel extends JPanel {
         scroll.getVerticalScrollBar().setUnitIncrement(14);
 
         cardPanel.add(scroll, BorderLayout.CENTER);
+        mainContent.add(cardPanel, BorderLayout.CENTER);
 
-        add(cardPanel, BorderLayout.CENTER);
+        add(mainContent, BorderLayout.CENTER);
     }
 
     public void refreshMejaGrid() {
@@ -137,7 +186,7 @@ public class AdminMejaViewPanel extends JPanel {
         Color bgCard = isTerisi ? new Color(0xFE, 0xF2, 0xF2) : new Color(0xF0, 0xFD, 0xF4);
         Color borderCard = isTerisi ? new Color(0xFE, 0xCD, 0xCD) : new Color(0xBB, 0xF7, 0xD0);
 
-        RoundedPanel card = new RoundedPanel(12, bgCard, borderCard, 1);
+        RoundedPanel card = new RoundedPanel(14, bgCard, borderCard, 1);
         card.setLayout(new BorderLayout(0, 8));
         card.setBorder(new EmptyBorder(14, 14, 14, 14));
         card.setPreferredSize(new Dimension(160, 120));
